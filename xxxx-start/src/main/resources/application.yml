@@ -1,2 +1,49 @@
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 10 #maximum concurrent
+spring:
+  application:
+    name: xxx.com
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      checkRandom:
+              registerHealthIndicator: true
+              #number of requests to determine the error rate
+              slidingWindowSize: 10
+              #number of half open requests
+              permittedNumberOfCallsInHalfOpenState: 3
+              #determine by time not the number of requests
+              #slidingWindowType: TIME_BASED
+              minimumNumberOfCalls: 5
+              waitDurationInOpenState: 5s
+              failureRateThreshold: 50
+              eventConsumerBufferSize: 10
+  ratelimiter:
+    instances:
+      backendA:
+        limitForPeriod: 2
+        limitRefreshPeriod: 10s
+        timeoutDuration: 0
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 100
+      backendB:
+        limitForPeriod: 6
+        limitRefreshPeriod: 500ms
+        timeoutDuration: 3s
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - '*'
+  endpoint:
+    health:
+      show-details: always
+
